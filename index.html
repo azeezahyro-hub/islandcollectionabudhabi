@@ -5,24 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Island Collection Abu Dhabi</title>
-<meta name="description" content="Discover Abu Dhabi's most iconic island destinations and selected waterfront property opportunities.">
+<meta name="description" content="Explore Abu Dhabi's islands, waterfront destinations and selected property opportunities.">
 
-<!-- CLEAN LUXURY FONT -->
+<!-- FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
 
+<!-- MAPLIBRE -->
+<link href="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.js"></script>
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
 <style>
 
 :root{
-  --navy:#071f2a;
-  --blue:#0b5266;
+  --ink:#071f2a;
+  --ocean:#0b5266;
   --aqua:#8ed8d7;
+  --sky:#dceff1;
   --ivory:#f5f3ed;
-  --white:#ffffff;
-  --sand:#ddd3c3;
-  --muted:#60757b;
-  --line:rgba(7,31,42,.15);
+  --white:#fff;
+  --sand:#ded5c7;
+  --muted:#667b81;
+  --line:rgba(7,31,42,.14);
 }
 
 *{
@@ -36,9 +45,10 @@ html{
 }
 
 body{
+  margin:0;
   font-family:"Manrope",sans-serif;
   background:var(--ivory);
-  color:var(--navy);
+  color:var(--ink);
   overflow-x:hidden;
 }
 
@@ -47,97 +57,76 @@ a{
   text-decoration:none;
 }
 
-button{
-  font-family:inherit;
+button,
+input,
+select{
+  font:inherit;
 }
 
-/* =========================
+/* ================================
    NAVIGATION
-========================= */
+================================ */
 
 .nav{
   position:fixed;
+  z-index:1000;
   top:0;
   left:0;
   width:100%;
-  height:90px;
+  height:88px;
   padding:0 4vw;
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  z-index:1000;
+  align-items:center;
   color:white;
-  transition:
-    background .4s ease,
-    color .4s ease,
-    height .4s ease;
+  transition:.4s ease;
 }
 
 .nav.scrolled{
-  height:72px;
-  color:var(--navy);
-  background:rgba(245,243,237,.90);
+  height:70px;
+  color:var(--ink);
+  background:rgba(245,243,237,.91);
   backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
   border-bottom:1px solid rgba(7,31,42,.08);
 }
 
-.brand{
+.logo{
   font-size:12px;
   line-height:1.35;
   font-weight:600;
-  letter-spacing:2.6px;
+  letter-spacing:2.4px;
 }
 
-.brand span{
+.logo span{
   font-weight:300;
   opacity:.75;
 }
 
-.nav-links{
+.navlinks{
   display:flex;
   align-items:center;
-  gap:30px;
+  gap:28px;
 }
 
-.nav-links a{
-  font-size:10px;
+.navlinks a{
+  font-size:9px;
   letter-spacing:1.6px;
   text-transform:uppercase;
 }
 
-.nav-links a:not(.consultation){
-  position:relative;
-}
-
-.nav-links a:not(.consultation)::after{
-  content:"";
-  position:absolute;
-  left:0;
-  bottom:-7px;
-  width:0;
-  height:1px;
-  background:currentColor;
-  transition:width .3s ease;
-}
-
-.nav-links a:hover::after{
-  width:100%;
-}
-
-.consultation{
+.nav-cta{
   border:1px solid currentColor;
-  padding:13px 18px;
+  padding:13px 17px;
 }
 
-.mobile-menu{
+.menu{
   display:none;
   font-size:20px;
 }
 
-/* =========================
+/* ================================
    HERO
-========================= */
+================================ */
 
 .hero{
   height:100vh;
@@ -145,105 +134,97 @@ button{
   position:relative;
   overflow:hidden;
   color:white;
-  background:#163d4c;
+  background:#0a3b4c;
 }
 
-.hero-media{
+.hero-image{
   position:absolute;
-  inset:-6%;
+  inset:-7%;
   background:
     linear-gradient(
       180deg,
-      rgba(3,28,38,.08) 0%,
-      rgba(3,28,38,.02) 42%,
-      rgba(3,28,38,.72) 100%
+      rgba(0,25,35,.05),
+      rgba(0,25,35,.05) 45%,
+      rgba(0,25,35,.74)
     ),
     url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2400&q=90");
   background-size:cover;
   background-position:center;
-  transform:scale(1.04);
 }
 
-.hero-glow{
+.hero-light{
   position:absolute;
   inset:0;
   background:
     radial-gradient(
-      circle at 68% 20%,
-      rgba(255,255,255,.28),
+      circle at 70% 22%,
+      rgba(255,255,255,.25),
       transparent 28%
     );
-  pointer-events:none;
 }
 
 .cloud{
   position:absolute;
-  z-index:1;
   border-radius:50%;
-  background:rgba(255,255,255,.28);
+  background:rgba(255,255,255,.27);
   filter:blur(45px);
   pointer-events:none;
 }
 
-.cloud-one{
-  width:620px;
+.cloud-a{
+  width:600px;
   height:120px;
-  top:17%;
+  top:18%;
   left:-650px;
-  animation:cloudMove 65s linear infinite;
+  animation:cloud 65s linear infinite;
 }
 
-.cloud-two{
-  width:850px;
-  height:150px;
-  top:30%;
+.cloud-b{
+  width:800px;
+  height:145px;
+  top:31%;
   left:-900px;
   opacity:.45;
-  animation:cloudMove 90s linear infinite;
+  animation:cloud 90s linear infinite;
 }
 
-@keyframes cloudMove{
+@keyframes cloud{
   to{
     transform:translateX(calc(100vw + 1700px));
   }
 }
 
-.hero-inner{
+.hero-content{
   position:relative;
   z-index:3;
   height:100%;
+  padding:0 4vw 5vh;
   display:flex;
   flex-direction:column;
   justify-content:flex-end;
-  padding:0 4vw 5vh;
 }
 
-.hero-eyebrow{
+.hero-meta{
+  border-top:1px solid rgba(255,255,255,.5);
+  padding-top:13px;
+  margin-bottom:25px;
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  border-top:1px solid rgba(255,255,255,.55);
-  padding-top:14px;
-  margin-bottom:25px;
   font-size:9px;
-  letter-spacing:2.7px;
+  letter-spacing:2.4px;
   text-transform:uppercase;
 }
 
-.hero-title{
+.hero h1{
+  max-width:1450px;
+  font-size:clamp(67px,9vw,145px);
   font-weight:300;
-  font-size:clamp(68px,9.5vw,150px);
-  line-height:.82;
+  line-height:.83;
   letter-spacing:-6px;
   text-transform:uppercase;
-  max-width:1400px;
 }
 
-.hero-title .thin{
-  font-weight:300;
-}
-
-.hero-title .accent{
+.hero h1 strong{
   font-weight:500;
 }
 
@@ -255,467 +236,552 @@ button{
   align-items:end;
 }
 
-.hero-copy{
-  width:min(540px,100%);
+.hero-bottom p{
+  max-width:530px;
   font-size:13px;
-  font-weight:300;
   line-height:1.9;
-  color:rgba(255,255,255,.88);
+  font-weight:300;
+  color:rgba(255,255,255,.87);
 }
 
-.hero-explore{
+.scroll-link{
   justify-self:end;
   display:flex;
   align-items:center;
-  gap:16px;
-  font-size:10px;
+  gap:14px;
+  font-size:9px;
   letter-spacing:2px;
-  text-transform:uppercase;
 }
 
-.hero-explore .circle{
-  width:44px;
-  height:44px;
+.scroll-circle{
+  width:43px;
+  height:43px;
   border:1px solid rgba(255,255,255,.7);
   border-radius:50%;
   display:grid;
   place-items:center;
-  transition:.3s;
 }
 
-.hero-explore:hover .circle{
-  background:white;
-  color:var(--navy);
+/* ================================
+   LIVE ATLAS — SECOND SCROLL
+================================ */
+
+.atlas{
+  background:#061c25;
+  color:white;
+  padding:115px 4vw 65px;
 }
 
-/* =========================
+.atlas-head{
+  display:grid;
+  grid-template-columns:1.4fr .6fr;
+  gap:7vw;
+  align-items:end;
+  margin-bottom:45px;
+}
+
+.eyebrow{
+  font-size:9px;
+  letter-spacing:2.4px;
+  text-transform:uppercase;
+}
+
+.atlas .eyebrow{
+  color:var(--aqua);
+  margin-bottom:27px;
+}
+
+.atlas h2{
+  font-size:clamp(57px,7.5vw,118px);
+  font-weight:300;
+  line-height:.87;
+  letter-spacing:-5px;
+  text-transform:uppercase;
+}
+
+.atlas h2 span{
+  color:var(--aqua);
+}
+
+.atlas-intro{
+  max-width:430px;
+  font-size:12px;
+  line-height:1.9;
+  color:#a9bec4;
+  padding-bottom:8px;
+}
+
+.filters{
+  display:flex;
+  gap:7px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  padding-bottom:18px;
+}
+
+.filters::-webkit-scrollbar{
+  display:none;
+}
+
+.filter{
+  flex:none;
+  border:1px solid rgba(255,255,255,.2);
+  background:transparent;
+  color:#d6e2e5;
+  border-radius:30px;
+  padding:10px 15px;
+  font-size:8px;
+  letter-spacing:1.3px;
+  cursor:pointer;
+}
+
+.filter.active{
+  background:var(--aqua);
+  border-color:var(--aqua);
+  color:var(--ink);
+}
+
+/* MAP */
+
+.map-shell{
+  height:82vh;
+  min-height:680px;
+  position:relative;
+  overflow:hidden;
+  background:#153b48;
+}
+
+#map{
+  position:absolute;
+  inset:0;
+}
+
+.island-panel{
+  position:absolute;
+  z-index:10;
+  left:22px;
+  top:22px;
+  width:225px;
+  padding:17px;
+  background:rgba(4,27,37,.88);
+  backdrop-filter:blur(17px);
+  border:1px solid rgba(255,255,255,.14);
+}
+
+.panel-title{
+  color:var(--aqua);
+  font-size:8px;
+  letter-spacing:2px;
+  padding:2px 2px 13px;
+}
+
+.island-panel button{
+  width:100%;
+  border:0;
+  border-top:1px solid rgba(255,255,255,.13);
+  background:transparent;
+  color:white;
+  text-align:left;
+  padding:11px 2px;
+  cursor:pointer;
+  font-size:9px;
+  letter-spacing:1.2px;
+  transition:.2s;
+}
+
+.island-panel button:hover{
+  color:var(--aqua);
+  padding-left:6px;
+}
+
+.island-panel button span{
+  display:inline-block;
+  width:30px;
+  color:#78939a;
+}
+
+.island-panel .reset{
+  color:var(--aqua);
+  margin-top:4px;
+}
+
+.map-status{
+  position:absolute;
+  z-index:10;
+  right:20px;
+  top:20px;
+  width:285px;
+  padding:20px;
+  background:rgba(245,243,237,.94);
+  color:var(--ink);
+  backdrop-filter:blur(15px);
+}
+
+.map-status .status-small{
+  font-size:8px;
+  letter-spacing:1.8px;
+  color:#597077;
+}
+
+.map-status h3{
+  margin-top:9px;
+  font-size:25px;
+  font-weight:400;
+  letter-spacing:-1px;
+}
+
+.map-status p{
+  margin-top:9px;
+  font-size:10px;
+  line-height:1.7;
+  color:#647a80;
+}
+
+.map-help{
+  position:absolute;
+  z-index:10;
+  bottom:20px;
+  right:20px;
+  background:rgba(4,27,37,.84);
+  padding:10px 13px;
+  font-size:7px;
+  letter-spacing:1.5px;
+  color:#c7d8db;
+}
+
+/* ISLAND MARKERS */
+
+.island-marker-wrap{
+  position:relative;
+  cursor:pointer;
+}
+
+.island-dot{
+  width:15px;
+  height:15px;
+  border-radius:50%;
+  background:var(--aqua);
+  border:3px solid white;
+  box-shadow:0 0 0 6px rgba(142,216,215,.22);
+}
+
+.island-name{
+  position:absolute;
+  left:18px;
+  top:-3px;
+  white-space:nowrap;
+  font-family:"Manrope";
+  color:#fff;
+  font-size:9px;
+  font-weight:600;
+  letter-spacing:1px;
+  text-shadow:0 2px 7px rgba(0,0,0,.8);
+}
+
+/* POIS */
+
+.poi{
+  width:13px;
+  height:13px;
+  border-radius:50%;
+  border:2px solid white;
+  cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.22);
+}
+
+.poi-attraction{background:#83a85b;}
+.poi-shopping{background:#a77bc5;}
+.poi-beach{background:#51bfae;}
+.poi-hotel{background:#d79759;}
+.poi-dining{background:#d37c98;}
+.poi-property{background:#32aeca;}
+.poi-education{background:#d9ac40;}
+.poi-health{background:#d96060;}
+.poi-mosque{background:#958b78;}
+
+.maplibregl-popup-content{
+  border-radius:0;
+  padding:18px 20px;
+  color:var(--ink);
+  font-family:"Manrope",sans-serif;
+}
+
+.popup-type{
+  display:block;
+  margin-bottom:7px;
+  color:#668087;
+  font-size:7px;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+}
+
+.maplibregl-popup-content strong{
+  display:block;
+  font-size:13px;
+  font-weight:500;
+}
+
+.maplibregl-popup-content small{
+  display:block;
+  margin-top:7px;
+  color:#687c82;
+}
+
+/* ================================
    INTRO
-========================= */
+================================ */
 
 .intro{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  padding:150px 5vw;
+  padding:155px 5vw;
   background:var(--ivory);
 }
 
-.section-grid{
-  width:100%;
+.grid{
   display:grid;
-  grid-template-columns:22% 78%;
+  grid-template-columns:21% 79%;
 }
 
-.section-index{
+.section-number{
+  padding-top:8px;
   font-size:9px;
-  letter-spacing:2.5px;
-  text-transform:uppercase;
-  padding-top:10px;
+  letter-spacing:2.4px;
 }
 
-.intro-title{
-  font-size:clamp(62px,8vw,125px);
+.intro h2,
+.collection h2,
+.investment h2{
+  font-size:clamp(60px,8vw,120px);
   font-weight:300;
+  line-height:.89;
   letter-spacing:-6px;
-  line-height:.9;
   text-transform:uppercase;
-  max-width:1100px;
 }
 
-.intro-title .water-word{
-  color:#17829a;
+.intro h2 span{
+  color:#168299;
 }
 
-.intro-detail{
-  margin-top:80px;
+.intro-bottom{
+  margin-top:75px;
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:8vw;
+  gap:7vw;
 }
 
-.intro-detail p{
+.intro-bottom p{
   max-width:520px;
-  color:var(--muted);
   font-size:13px;
   line-height:2;
-  font-weight:300;
+  color:var(--muted);
 }
 
-.island-mini-list{
+.island-list{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px 40px;
-  font-size:10px;
-  letter-spacing:1.8px;
-  text-transform:uppercase;
+  gap:10px 35px;
 }
 
-.island-mini-list span{
+.island-list span{
   border-bottom:1px solid var(--line);
-  padding:0 0 10px;
+  padding-bottom:10px;
+  font-size:9px;
+  letter-spacing:1.5px;
 }
 
-/* =========================
-   FULL IMAGE STATEMENT
-========================= */
+/* ================================
+   CINEMATIC SECTION
+================================ */
 
-.statement{
-  height:105vh;
-  min-height:760px;
+.cinematic{
+  height:100vh;
+  min-height:720px;
   position:relative;
   overflow:hidden;
   color:white;
 }
 
-.statement-image{
+.cinematic-image{
   position:absolute;
-  inset:-10%;
+  inset:-8%;
   background:
-    linear-gradient(
-      90deg,
-      rgba(3,30,40,.62),
-      rgba(3,30,40,.10)
-    ),
+    linear-gradient(90deg,rgba(3,28,38,.66),rgba(3,28,38,.08)),
     url("https://images.unsplash.com/photo-1499403474843-04e72c14df8a?auto=format&fit=crop&w=2400&q=90");
   background-size:cover;
   background-position:center;
 }
 
-.statement-content{
+.cinematic-content{
   position:relative;
   z-index:2;
   height:100%;
+  padding:8vh 5vw;
   display:flex;
   flex-direction:column;
   justify-content:space-between;
-  padding:9vh 5vw 7vh;
 }
 
-.statement-number{
-  font-size:9px;
-  letter-spacing:2.5px;
-}
-
-.statement h2{
-  font-size:clamp(64px,9vw,145px);
+.cinematic h2{
+  font-size:clamp(62px,9vw,140px);
   font-weight:300;
   line-height:.85;
   letter-spacing:-6px;
   text-transform:uppercase;
-  max-width:1150px;
-}
-
-.statement-bottom{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  gap:50px;
-}
-
-.statement-bottom p{
-  max-width:460px;
-  font-size:12px;
-  line-height:1.9;
-  color:rgba(255,255,255,.82);
-}
-
-.statement-bottom span{
-  font-size:9px;
-  letter-spacing:2px;
-}
-
-/* =========================
-   ISLAND COLLECTION
-========================= */
-
-.collection{
-  padding:150px 0 160px;
-  background:var(--ivory);
-}
-
-.collection-head{
-  padding:0 5vw 90px;
-  display:grid;
-  grid-template-columns:22% 78%;
-}
-
-.collection-head h2{
-  font-size:clamp(60px,8vw,120px);
-  line-height:.88;
-  font-weight:300;
-  letter-spacing:-6px;
-  text-transform:uppercase;
-}
-
-.collection-head p{
-  max-width:500px;
-  margin-top:40px;
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.9;
-}
-
-/* =========================
-   ISLAND FEATURE
-========================= */
-
-.island-feature{
-  padding:0 5vw;
-  margin-bottom:140px;
-}
-
-.feature-top{
-  display:flex;
-  justify-content:space-between;
-  border-top:1px solid var(--line);
-  padding:18px 0 28px;
-  font-size:9px;
-  letter-spacing:2px;
-  text-transform:uppercase;
-}
-
-.feature-image{
-  height:72vh;
-  min-height:570px;
-  overflow:hidden;
-  position:relative;
-}
-
-.feature-image img{
-  width:100%;
-  height:120%;
-  object-fit:cover;
-  display:block;
-  transform:scale(1.04);
-}
-
-.feature-content{
-  display:grid;
-  grid-template-columns:1.4fr .6fr;
-  gap:60px;
-  padding-top:30px;
-}
-
-.feature-content h3{
-  font-size:clamp(55px,7vw,105px);
-  font-weight:300;
-  letter-spacing:-5px;
-  line-height:.9;
-  text-transform:uppercase;
-}
-
-.feature-copy{
-  padding-top:8px;
-}
-
-.feature-copy strong{
-  display:block;
-  font-size:10px;
-  font-weight:500;
-  letter-spacing:1.8px;
-  text-transform:uppercase;
-  margin-bottom:18px;
-}
-
-.feature-copy p{
-  font-size:12px;
-  line-height:1.9;
-  color:var(--muted);
-  max-width:430px;
-}
-
-.feature-link{
-  display:inline-block;
-  margin-top:25px;
-  padding-bottom:6px;
-  border-bottom:1px solid var(--navy);
-  font-size:9px;
-  letter-spacing:1.8px;
-}
-
-/* =========================
-   ISLAND MARQUEE
-========================= */
-
-.marquee-section{
-  background:#d9edef;
-  overflow:hidden;
-  padding:70px 0;
-}
-
-.marquee{
-  display:flex;
-  width:max-content;
-  white-space:nowrap;
-}
-
-.marquee-track{
-  display:flex;
-  align-items:center;
-  animation:marquee 30s linear infinite;
-}
-
-.marquee span{
-  font-size:clamp(65px,9vw,140px);
-  font-weight:300;
-  letter-spacing:-5px;
-  text-transform:uppercase;
-  margin-right:70px;
-}
-
-.marquee i{
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  background:#1595aa;
-  margin-right:70px;
-}
-
-@keyframes marquee{
-  from{
-    transform:translateX(0);
-  }
-  to{
-    transform:translateX(-50%);
-  }
-}
-
-/* =========================
-   ATLAS PREVIEW
-========================= */
-
-.atlas-preview{
-  min-height:100vh;
-  background:var(--navy);
-  color:white;
-  display:flex;
-  align-items:center;
-  position:relative;
-  overflow:hidden;
-  padding:140px 5vw;
-}
-
-.atlas-orbit{
-  position:absolute;
-  width:70vw;
-  height:70vw;
-  border:1px solid rgba(142,216,215,.18);
-  border-radius:50%;
-  right:-22vw;
-  top:50%;
-  transform:translateY(-50%);
-}
-
-.atlas-orbit::before,
-.atlas-orbit::after{
-  content:"";
-  position:absolute;
-  border:1px solid rgba(142,216,215,.12);
-  border-radius:50%;
-  inset:12%;
-}
-
-.atlas-orbit::after{
-  inset:27%;
-}
-
-.atlas-layout{
-  width:100%;
-  display:grid;
-  grid-template-columns:22% 78%;
-  position:relative;
-  z-index:2;
-}
-
-.atlas-copy h2{
-  font-size:clamp(65px,8vw,125px);
-  font-weight:300;
-  letter-spacing:-6px;
-  line-height:.88;
-  text-transform:uppercase;
-  max-width:1000px;
-}
-
-.atlas-copy h2 span{
-  color:var(--aqua);
-}
-
-.atlas-copy p{
-  margin-top:40px;
-  max-width:520px;
-  font-size:13px;
-  line-height:1.9;
-  color:#b9cbcf;
-}
-
-.atlas-tags{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:45px;
-  max-width:700px;
-}
-
-.atlas-tag{
-  border:1px solid rgba(255,255,255,.25);
-  border-radius:100px;
-  padding:10px 15px;
-  font-size:8px;
-  letter-spacing:1.4px;
-  text-transform:uppercase;
-}
-
-.atlas-button{
-  display:inline-flex;
-  margin-top:45px;
-  background:white;
-  color:var(--navy);
-  padding:17px 23px;
-  font-size:9px;
-  letter-spacing:1.8px;
-  text-transform:uppercase;
-}
-
-/* =========================
-   INVESTMENT
-========================= */
-
-.investment{
-  padding:160px 5vw;
-  background:#f8f7f3;
-}
-
-.investment-layout{
-  display:grid;
-  grid-template-columns:22% 78%;
-}
-
-.investment-content h2{
-  font-size:clamp(60px,8vw,120px);
-  font-weight:300;
-  letter-spacing:-6px;
-  line-height:.88;
-  text-transform:uppercase;
   max-width:1100px;
 }
 
-.investment-intro{
-  margin-top:45px;
-  max-width:590px;
+.cinematic-bottom{
+  max-width:500px;
+  font-size:12px;
+  line-height:1.9;
+  color:rgba(255,255,255,.8);
+}
+
+/* ================================
+   ISLAND COLLECTION
+================================ */
+
+.collection{
+  padding:150px 5vw;
+}
+
+.collection-heading{
+  display:grid;
+  grid-template-columns:21% 79%;
+  margin-bottom:90px;
+}
+
+.collection-copy{
+  margin-top:35px;
+  max-width:500px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.9;
+}
+
+.island-card{
+  border-top:1px solid var(--line);
+  padding:25px 0 110px;
+}
+
+.island-card-top{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:25px;
+  font-size:8px;
+  letter-spacing:1.8px;
+  text-transform:uppercase;
+}
+
+.island-photo{
+  height:67vh;
+  min-height:500px;
+  overflow:hidden;
+}
+
+.island-photo img{
+  width:100%;
+  height:115%;
+  object-fit:cover;
+}
+
+.island-card-bottom{
+  display:grid;
+  grid-template-columns:1.3fr .7fr;
+  gap:60px;
+  padding-top:28px;
+}
+
+.island-card h3{
+  font-size:clamp(50px,7vw,100px);
+  font-weight:300;
+  line-height:.9;
+  letter-spacing:-5px;
+  text-transform:uppercase;
+}
+
+.island-card p{
+  max-width:440px;
+  font-size:12px;
+  line-height:1.9;
+  color:var(--muted);
+}
+
+.island-card a{
+  display:inline-block;
+  margin-top:20px;
+  padding-bottom:5px;
+  border-bottom:1px solid var(--ink);
+  font-size:8px;
+  letter-spacing:1.6px;
+}
+
+/* ================================
+   MARQUEE
+================================ */
+
+.marquee{
+  overflow:hidden;
+  padding:65px 0;
+  background:var(--sky);
+}
+
+.marquee-track{
+  width:max-content;
+  display:flex;
+  align-items:center;
+  animation:marquee 32s linear infinite;
+}
+
+.marquee span{
+  margin-right:60px;
+  font-size:clamp(65px,9vw,135px);
+  font-weight:300;
+  letter-spacing:-5px;
+  text-transform:uppercase;
+}
+
+.marquee b{
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  background:#168299;
+  margin-right:60px;
+}
+
+@keyframes marquee{
+  to{transform:translateX(-50%);}
+}
+
+/* ================================
+   INVESTMENT
+================================ */
+
+.investment{
+  padding:155px 5vw;
+  background:#f8f7f3;
+}
+
+.investment-content{
+  max-width:1050px;
+}
+
+.investment p{
+  max-width:580px;
+  margin-top:40px;
   color:var(--muted);
   font-size:13px;
   line-height:2;
 }
 
 .investment-rows{
-  margin-top:90px;
+  margin-top:75px;
 }
 
 .investment-row{
   border-top:1px solid var(--line);
-  padding:24px 0;
+  padding:23px 0;
   display:grid;
-  grid-template-columns:80px 1fr auto;
+  grid-template-columns:70px 1fr auto;
   align-items:center;
 }
 
@@ -723,349 +789,263 @@ button{
   border-bottom:1px solid var(--line);
 }
 
-.investment-row span:first-child{
+.investment-row span{
   font-size:9px;
 }
 
 .investment-row strong{
-  font-size:14px;
+  font-size:13px;
   font-weight:400;
-  letter-spacing:.5px;
 }
 
-.investment-row span:last-child{
-  font-size:17px;
-}
-
-/* =========================
-   GUIDE CTA
-========================= */
+/* ================================
+   GUIDE
+================================ */
 
 .guide{
-  min-height:95vh;
-  position:relative;
-  color:white;
-  display:flex;
+  min-height:90vh;
+  padding:130px 5vw;
+  display:grid;
+  grid-template-columns:1fr .55fr;
+  gap:8vw;
   align-items:center;
-  overflow:hidden;
+  color:white;
   background:
-    linear-gradient(
-      90deg,
-      rgba(4,34,45,.91),
-      rgba(4,34,45,.45)
-    ),
+    linear-gradient(90deg,rgba(4,34,45,.94),rgba(4,34,45,.45)),
     url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2400&q=90");
   background-size:cover;
   background-position:center;
 }
 
-.guide-layout{
-  width:100%;
-  padding:120px 5vw;
-  display:grid;
-  grid-template-columns:1fr .55fr;
-  gap:9vw;
-  align-items:center;
-}
-
 .guide h2{
-  font-size:clamp(62px,8vw,120px);
+  margin-top:30px;
+  font-size:clamp(58px,7.5vw,110px);
   font-weight:300;
   line-height:.87;
-  letter-spacing:-6px;
+  letter-spacing:-5px;
   text-transform:uppercase;
 }
 
 .guide-copy{
-  margin-top:35px;
+  margin-top:30px;
   max-width:500px;
   font-size:12px;
   line-height:1.9;
-  color:rgba(255,255,255,.78);
+  color:#cfdddf;
 }
 
-.guide-form{
-  background:rgba(248,247,243,.95);
-  color:var(--navy);
-  padding:45px;
-  backdrop-filter:blur(15px);
+.form{
+  padding:40px;
+  background:rgba(248,247,243,.96);
+  color:var(--ink);
 }
 
-.guide-form .form-label{
-  font-size:9px;
+.form-label{
+  font-size:8px;
   letter-spacing:2px;
   text-transform:uppercase;
-  margin-bottom:12px;
 }
 
-.guide-form h3{
-  font-size:32px;
+.form h3{
+  margin:12px 0 25px;
+  font-size:29px;
   font-weight:300;
-  letter-spacing:-1.5px;
-  margin-bottom:30px;
+  letter-spacing:-1px;
 }
 
-.guide-form input,
-.guide-form select{
+.form input,
+.form select{
   width:100%;
-  padding:16px 0;
-  background:transparent;
   border:0;
-  border-bottom:1px solid rgba(7,31,42,.25);
+  border-bottom:1px solid rgba(7,31,42,.24);
   border-radius:0;
+  background:transparent;
+  padding:15px 0;
   outline:none;
-  font-family:"Manrope";
   font-size:11px;
 }
 
-.guide-form button{
-  margin-top:30px;
+.form button{
   width:100%;
-  padding:17px;
+  margin-top:27px;
   border:0;
-  background:var(--navy);
+  padding:16px;
+  background:var(--ink);
   color:white;
-  font-size:9px;
-  letter-spacing:1.8px;
   cursor:pointer;
+  font-size:8px;
+  letter-spacing:1.7px;
 }
 
-/* =========================
+/* ================================
    FOOTER
-========================= */
+================================ */
 
-.footer{
-  background:#041a23;
+footer{
+  padding:80px 5vw 30px;
+  background:#031820;
   color:white;
-  padding:90px 5vw 35px;
 }
 
-.footer-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-}
-
-.footer-brand{
-  font-size:clamp(50px,7vw,105px);
+.footer-title{
+  font-size:clamp(48px,7vw,100px);
   font-weight:300;
-  letter-spacing:-5px;
   line-height:.88;
+  letter-spacing:-5px;
   text-transform:uppercase;
 }
 
-.footer-small{
-  text-align:right;
-  font-size:9px;
-  line-height:2;
-  letter-spacing:1.5px;
-  color:#9fb4b9;
-}
-
 .footer-bottom{
-  margin-top:80px;
-  padding-top:25px;
+  margin-top:65px;
   border-top:1px solid rgba(255,255,255,.15);
+  padding-top:23px;
   display:flex;
   justify-content:space-between;
   font-size:8px;
-  letter-spacing:1.5px;
-  color:#8ea4a9;
+  letter-spacing:1.3px;
+  color:#91a7ac;
 }
 
-/* =========================
-   REVEAL HELPERS
-========================= */
+/* ================================
+   ANIMATION
+================================ */
 
 .reveal{
   opacity:0;
-  transform:translateY(60px);
+  transform:translateY(55px);
 }
 
-.image-reveal{
-  clip-path:inset(0 0 100% 0);
-}
-
-/* =========================
+/* ================================
    MOBILE
-========================= */
+================================ */
 
 @media(max-width:900px){
 
-  .nav-links{
+  .navlinks{
     display:none;
   }
 
-  .mobile-menu{
+  .menu{
     display:block;
   }
 
-  .hero-title,
-  .intro-title,
-  .collection-head h2,
-  .atlas-copy h2,
-  .investment-content h2,
-  .guide h2{
-    letter-spacing:-3px;
-  }
-
-  .section-grid,
-  .collection-head,
-  .atlas-layout,
-  .investment-layout{
-    grid-template-columns:1fr;
-    gap:35px;
-  }
-
   .hero-bottom,
-  .intro-detail,
-  .feature-content,
-  .guide-layout{
+  .atlas-head,
+  .grid,
+  .intro-bottom,
+  .collection-heading,
+  .island-card-bottom,
+  .guide{
     grid-template-columns:1fr;
   }
 
-  .hero-explore{
+  .scroll-link{
     justify-self:start;
   }
 
-  .section-index{
-    margin-bottom:15px;
+  .section-number{
+    margin-bottom:30px;
   }
 
-  .feature-image{
-    height:60vh;
-    min-height:450px;
+  .map-shell{
+    height:720px;
+    min-height:0;
   }
 
-  .guide-layout{
-    padding-top:100px;
-    padding-bottom:100px;
+  .map-status{
+    display:none;
   }
 
-  .guide-form{
-    max-width:600px;
+  .island-panel{
+    width:185px;
+    max-height:315px;
+    overflow-y:auto;
   }
 
 }
 
 @media(max-width:600px){
 
-  .nav{
-    height:75px;
-  }
-
   .hero{
     min-height:680px;
   }
 
-  .hero-inner{
-    padding-bottom:45px;
-  }
-
-  .hero-title{
-    font-size:54px;
-    line-height:.88;
+  .hero h1{
+    font-size:52px;
     letter-spacing:-2.5px;
   }
 
-  .hero-eyebrow span:last-child{
+  .hero-meta span:last-child{
     display:none;
   }
 
-  .intro{
-    padding-top:100px;
-    padding-bottom:100px;
+  .atlas{
+    padding:95px 18px 45px;
   }
 
-  .intro-title,
-  .collection-head h2,
-  .atlas-copy h2,
-  .investment-content h2,
+  .atlas h2,
+  .intro h2,
+  .collection h2,
+  .investment h2,
   .guide h2{
-    font-size:49px;
-    letter-spacing:-2.5px;
-  }
-
-  .intro-detail{
-    margin-top:50px;
-  }
-
-  .island-mini-list{
-    margin-top:20px;
-  }
-
-  .statement{
-    min-height:700px;
-  }
-
-  .statement h2{
-    font-size:51px;
-    letter-spacing:-2.5px;
-  }
-
-  .statement-bottom{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .collection{
-    padding-top:100px;
-  }
-
-  .collection-head{
-    padding-bottom:60px;
-  }
-
-  .island-feature{
-    margin-bottom:90px;
-  }
-
-  .feature-image{
-    height:55vh;
-    min-height:400px;
-  }
-
-  .feature-content h3{
     font-size:48px;
+    letter-spacing:-2.5px;
+  }
+
+  .map-shell{
+    height:650px;
+  }
+
+  .island-panel{
+    top:12px;
+    left:12px;
+    width:165px;
+    padding:12px;
+  }
+
+  .map-help{
+    display:none;
+  }
+
+  .intro,
+  .collection,
+  .investment{
+    padding:100px 20px;
+  }
+
+  .cinematic h2{
+    font-size:50px;
+    letter-spacing:-2.5px;
+  }
+
+  .island-photo{
+    height:50vh;
+    min-height:390px;
+  }
+
+  .island-card h3{
+    font-size:46px;
     letter-spacing:-2px;
   }
 
-  .atlas-preview,
-  .investment{
-    padding-top:100px;
-    padding-bottom:100px;
+  .guide{
+    padding:100px 20px;
   }
 
-  .investment-row{
-    grid-template-columns:45px 1fr auto;
-  }
-
-  .guide-form{
-    padding:30px 24px;
-  }
-
-  .footer-top{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:45px;
-  }
-
-  .footer-small{
-    text-align:left;
+  .form{
+    padding:30px 22px;
   }
 
   .footer-bottom{
     flex-direction:column;
-    gap:12px;
+    gap:10px;
   }
 
 }
 
 @media(prefers-reduced-motion:reduce){
 
-  html{
-    scroll-behavior:auto;
-  }
+  html{scroll-behavior:auto;}
 
   .cloud,
   .marquee-track{
@@ -1083,20 +1063,20 @@ button{
 
 <nav class="nav" id="nav">
 
-  <a href="#" class="brand">
+  <a href="#home" class="logo">
     ISLAND COLLECTION<br>
     <span>ABU DHABI</span>
   </a>
 
-  <div class="nav-links">
+  <div class="navlinks">
+    <a href="#atlas">Island Atlas</a>
     <a href="#collection">Islands</a>
-    <a href="#atlas">Atlas</a>
     <a href="#investment">Why Abu Dhabi</a>
     <a href="#guide">Investment Guide</a>
-    <a class="consultation" href="#guide">Book Consultation</a>
+    <a href="#guide" class="nav-cta">Book Consultation</a>
   </div>
 
-  <div class="mobile-menu">☰</div>
+  <div class="menu">☰</div>
 
 </nav>
 
@@ -1105,35 +1085,35 @@ button{
 
 <header class="hero" id="home">
 
-  <div class="hero-media"></div>
-  <div class="hero-glow"></div>
+  <div class="hero-image"></div>
+  <div class="hero-light"></div>
 
-  <div class="cloud cloud-one"></div>
-  <div class="cloud cloud-two"></div>
+  <div class="cloud cloud-a"></div>
+  <div class="cloud cloud-b"></div>
 
-  <div class="hero-inner">
+  <div class="hero-content">
 
-    <div class="hero-eyebrow">
+    <div class="hero-meta">
       <span>Abu Dhabi — Between Sea & Sky</span>
       <span>Island Property & Investment</span>
     </div>
 
-    <h1 class="hero-title">
-      <span class="thin">Discover Abu Dhabi's</span><br>
-      <span class="accent">Iconic Islands.</span>
+    <h1>
+      Discover Abu Dhabi's<br>
+      <strong>Iconic Islands.</strong>
     </h1>
 
     <div class="hero-bottom">
 
-      <p class="hero-copy">
-        An immersive guide to Abu Dhabi's most remarkable
-        island destinations, waterfront communities and
-        selected real estate opportunities.
+      <p>
+        Explore Abu Dhabi through its islands — from cultural
+        waterfront districts and natural coastlines to established
+        communities and emerging residential destinations.
       </p>
 
-      <a href="#intro" class="hero-explore">
-        Explore the collection
-        <span class="circle">↓</span>
+      <a href="#atlas" class="scroll-link">
+        EXPLORE THE ATLAS
+        <span class="scroll-circle">↓</span>
       </a>
 
     </div>
@@ -1143,42 +1123,166 @@ button{
 </header>
 
 
+<!-- SECOND SCROLL: ACTIVE MAP -->
+
+<section class="atlas" id="atlas">
+
+  <div class="atlas-head">
+
+    <div>
+
+      <div class="eyebrow">
+        01 / Interactive Island Atlas
+      </div>
+
+      <h2>
+        EXPLORE ABU DHABI.<br>
+        <span>ISLAND BY ISLAND.</span>
+      </h2>
+
+    </div>
+
+    <p class="atlas-intro">
+      Drag across the capital or choose an island.
+      Zoom closer to reveal selected destinations and points
+      of interest. Use the filters to explore by category.
+    </p>
+
+  </div>
+
+
+  <div class="filters">
+
+    <button class="filter active" data-filter="all">ALL</button>
+    <button class="filter" data-filter="property">PROPERTIES</button>
+    <button class="filter" data-filter="education">EDUCATION</button>
+    <button class="filter" data-filter="health">HEALTH</button>
+    <button class="filter" data-filter="shopping">SHOPPING</button>
+    <button class="filter" data-filter="hotel">HOTELS</button>
+    <button class="filter" data-filter="beach">BEACHES</button>
+    <button class="filter" data-filter="dining">DINING</button>
+    <button class="filter" data-filter="attraction">ATTRACTIONS</button>
+    <button class="filter" data-filter="mosque">MOSQUES</button>
+
+  </div>
+
+
+  <div class="map-shell">
+
+    <div id="map"></div>
+
+
+    <div class="island-panel">
+
+      <div class="panel-title">
+        EXPLORE ISLANDS
+      </div>
+
+      <button data-island="saadiyat">
+        <span>01</span> SAADIYAT
+      </button>
+
+      <button data-island="yas">
+        <span>02</span> YAS
+      </button>
+
+      <button data-island="fahid">
+        <span>03</span> FAHID
+      </button>
+
+      <button data-island="hudayriyat">
+        <span>04</span> HUDAYRIYAT
+      </button>
+
+      <button data-island="ramhan">
+        <span>05</span> RAMHAN
+      </button>
+
+      <button data-island="jubail">
+        <span>06</span> JUBAIL
+      </button>
+
+      <button data-island="reem">
+        <span>07</span> AL REEM
+      </button>
+
+      <button data-island="maryah">
+        <span>08</span> AL MARYAH
+      </button>
+
+      <button data-island="nurai">
+        <span>09</span> NURAI
+      </button>
+
+      <button class="reset" id="resetMap">
+        ← VIEW ALL ABU DHABI
+      </button>
+
+    </div>
+
+
+    <div class="map-status">
+
+      <div class="status-small">
+        CURRENT VIEW
+      </div>
+
+      <h3 id="mapTitle">
+        Abu Dhabi Islands
+      </h3>
+
+      <p id="mapText">
+        Select an island or zoom into the map to begin exploring.
+      </p>
+
+    </div>
+
+
+    <div class="map-help">
+      DRAG TO EXPLORE &nbsp; • &nbsp; SCROLL TO ZOOM
+    </div>
+
+  </div>
+
+</section>
+
+
 <!-- INTRO -->
 
-<section class="intro" id="intro">
+<section class="intro">
 
-  <div class="section-grid">
+  <div class="grid">
 
-    <div class="section-index">
-      01 / The Capital
+    <div class="section-number">
+      02 / THE CAPITAL
     </div>
 
     <div>
 
-      <h2 class="intro-title reveal">
+      <h2 class="reveal">
         A CAPITAL<br>
         SHAPED BY<br>
-        <span class="water-word">WATER.</span>
+        <span>WATER.</span>
       </h2>
 
-      <div class="intro-detail">
+      <div class="intro-bottom">
 
         <p class="reveal">
-          Abu Dhabi's coastline is defined by a remarkable
-          collection of islands. Each offers a different
-          relationship with the water, architecture, culture,
-          nature and contemporary waterfront living.
+          Abu Dhabi's coastline is shaped by a remarkable
+          collection of island destinations, each with a different
+          relationship to architecture, culture, nature,
+          entertainment and waterfront living.
         </p>
 
-        <div class="island-mini-list reveal">
-          <span>Yas Island</span>
+        <div class="island-list reveal">
           <span>Saadiyat Island</span>
+          <span>Yas Island</span>
           <span>Fahid Island</span>
           <span>Hudayriyat Island</span>
           <span>Ramhan Island</span>
+          <span>Jubail Island</span>
           <span>Al Reem Island</span>
           <span>Al Maryah Island</span>
-          <span>Jubail Island</span>
           <span>Nurai Island</span>
         </div>
 
@@ -1191,16 +1295,16 @@ button{
 </section>
 
 
-<!-- CINEMATIC STATEMENT -->
+<!-- CINEMATIC -->
 
-<section class="statement">
+<section class="cinematic">
 
-  <div class="statement-image"></div>
+  <div class="cinematic-image"></div>
 
-  <div class="statement-content">
+  <div class="cinematic-content">
 
-    <div class="statement-number">
-      02 / BETWEEN SEA & SKY
+    <div class="eyebrow">
+      03 / BETWEEN SEA & SKY
     </div>
 
     <h2 class="reveal">
@@ -1209,18 +1313,12 @@ button{
       WATER'S EDGE.
     </h2>
 
-    <div class="statement-bottom">
-
-      <p>
-        From cultural districts and natural coastlines to
-        private island communities and globally recognised
-        destinations, Abu Dhabi offers many expressions
-        of waterfront living.
-      </p>
-
-      <span>SCROLL TO DISCOVER ↓</span>
-
-    </div>
+    <p class="cinematic-bottom">
+      From cultural districts and natural coastlines
+      to private communities and globally recognised
+      destinations, Abu Dhabi offers many expressions
+      of island living.
+    </p>
 
   </div>
 
@@ -1231,22 +1329,21 @@ button{
 
 <section class="collection" id="collection">
 
-  <div class="collection-head">
+  <div class="collection-heading">
 
-    <div class="section-index">
-      03 / The Islands
+    <div class="section-number">
+      04 / THE COLLECTION
     </div>
 
     <div>
 
       <h2 class="reveal">
-        ONE CAPITAL.<br>
         DISTINCTIVE<br>
         ISLAND STORIES.
       </h2>
 
-      <p class="reveal">
-        Explore the character, lifestyle and selected
+      <p class="collection-copy reveal">
+        Explore the lifestyle, character and selected
         property opportunities of Abu Dhabi's leading
         island destinations.
       </p>
@@ -1256,40 +1353,35 @@ button{
   </div>
 
 
-  <!-- SAADIYAT -->
+  <article class="island-card">
 
-  <article class="island-feature">
-
-    <div class="feature-top">
-      <span>01</span>
-      <span>Culture / Beachfront / Luxury</span>
+    <div class="island-card-top">
+      <span>01 / SAADIYAT ISLAND</span>
+      <span>CULTURE • BEACHFRONT • LUXURY</span>
     </div>
 
-    <div class="feature-image image-reveal">
+    <div class="island-photo">
       <img
         src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2200&q=90"
-        alt="Waterfront landscape">
+        alt="Waterfront">
     </div>
 
-    <div class="feature-content">
+    <div class="island-card-bottom">
 
       <h3 class="reveal">
-        Saadiyat<br>
-        Island
+        Saadiyat<br>Island
       </h3>
 
-      <div class="feature-copy reveal">
-
-        <strong>Abu Dhabi's cultural coastline</strong>
+      <div class="reveal">
 
         <p>
-          A destination where beachfront living,
-          architecture, culture and some of the capital's
-          most prestigious residential addresses meet.
+          A waterfront destination associated with cultural
+          landmarks, beaches, resorts and prestigious
+          residential addresses.
         </p>
 
-        <a href="#atlas" class="feature-link">
-          EXPLORE ON THE ATLAS ↗
+        <a href="#atlas" data-jump="saadiyat">
+          VIEW ON INTERACTIVE MAP ↗
         </a>
 
       </div>
@@ -1299,40 +1391,35 @@ button{
   </article>
 
 
-  <!-- YAS -->
+  <article class="island-card">
 
-  <article class="island-feature">
-
-    <div class="feature-top">
-      <span>02</span>
-      <span>Lifestyle / Entertainment / Waterfront</span>
+    <div class="island-card-top">
+      <span>02 / YAS ISLAND</span>
+      <span>LIFESTYLE • ENTERTAINMENT • WATERFRONT</span>
     </div>
 
-    <div class="feature-image image-reveal">
+    <div class="island-photo">
       <img
         src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=2200&q=90"
-        alt="Modern waterfront city">
+        alt="Modern waterfront">
     </div>
 
-    <div class="feature-content">
+    <div class="island-card-bottom">
 
       <h3 class="reveal">
-        Yas<br>
-        Island
+        Yas<br>Island
       </h3>
 
-      <div class="feature-copy reveal">
-
-        <strong>A global lifestyle destination</strong>
+      <div class="reveal">
 
         <p>
-          Residential communities, waterfront districts
-          and major leisure destinations come together
-          in one of Abu Dhabi's best-known islands.
+          One of Abu Dhabi's best-known lifestyle destinations,
+          bringing together residential communities,
+          entertainment and waterfront districts.
         </p>
 
-        <a href="#atlas" class="feature-link">
-          EXPLORE ON THE ATLAS ↗
+        <a href="#atlas" data-jump="yas">
+          VIEW ON INTERACTIVE MAP ↗
         </a>
 
       </div>
@@ -1342,39 +1429,34 @@ button{
   </article>
 
 
-  <!-- FAHID -->
+  <article class="island-card">
 
-  <article class="island-feature">
-
-    <div class="feature-top">
-      <span>03</span>
-      <span>Nature / Wellness / Coastal Living</span>
+    <div class="island-card-top">
+      <span>03 / FAHID ISLAND</span>
+      <span>NATURE • WELLNESS • COASTAL LIVING</span>
     </div>
 
-    <div class="feature-image image-reveal">
+    <div class="island-photo">
       <img
         src="https://images.unsplash.com/photo-1473116763249-2faaef81ccda?auto=format&fit=crop&w=2200&q=90"
-        alt="Coastal landscape">
+        alt="Coastline">
     </div>
 
-    <div class="feature-content">
+    <div class="island-card-bottom">
 
       <h3 class="reveal">
-        Fahid<br>
-        Island
+        Fahid<br>Island
       </h3>
 
-      <div class="feature-copy reveal">
-
-        <strong>A new coastal destination</strong>
+      <div class="reveal">
 
         <p>
-          An emerging island destination shaped around
-          contemporary coastal living, nature and wellness.
+          An emerging coastal destination focused on
+          contemporary island living, nature and wellness.
         </p>
 
-        <a href="#atlas" class="feature-link">
-          EXPLORE ON THE ATLAS ↗
+        <a href="#atlas" data-jump="fahid">
+          VIEW ON INTERACTIVE MAP ↗
         </a>
 
       </div>
@@ -1388,78 +1470,29 @@ button{
 
 <!-- MOVING ISLAND NAMES -->
 
-<section class="marquee-section">
+<section class="marquee">
 
-  <div class="marquee">
+  <div class="marquee-track">
 
-    <div class="marquee-track">
+    <span>Saadiyat</span><b></b>
+    <span>Yas</span><b></b>
+    <span>Fahid</span><b></b>
+    <span>Hudayriyat</span><b></b>
+    <span>Ramhan</span><b></b>
+    <span>Jubail</span><b></b>
+    <span>Al Reem</span><b></b>
+    <span>Al Maryah</span><b></b>
+    <span>Nurai</span><b></b>
 
-      <span>Saadiyat</span><i></i>
-      <span>Yas</span><i></i>
-      <span>Fahid</span><i></i>
-      <span>Hudayriyat</span><i></i>
-      <span>Ramhan</span><i></i>
-      <span>Jubail</span><i></i>
-
-      <span>Saadiyat</span><i></i>
-      <span>Yas</span><i></i>
-      <span>Fahid</span><i></i>
-      <span>Hudayriyat</span><i></i>
-      <span>Ramhan</span><i></i>
-      <span>Jubail</span><i></i>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- ATLAS PREVIEW -->
-
-<section class="atlas-preview" id="atlas">
-
-  <div class="atlas-orbit"></div>
-
-  <div class="atlas-layout">
-
-    <div class="section-index">
-      04 / Interactive Atlas
-    </div>
-
-    <div class="atlas-copy">
-
-      <h2 class="reveal">
-        EXPLORE<br>
-        ABU DHABI<br>
-        <span>ISLAND BY ISLAND.</span>
-      </h2>
-
-      <p class="reveal">
-        The next stage of Island Collection will transform
-        this section into an interactive Abu Dhabi atlas.
-        Zoom into each island and explore properties,
-        schools, healthcare, retail, beaches, hotels,
-        restaurants and major attractions.
-      </p>
-
-      <div class="atlas-tags reveal">
-        <span class="atlas-tag">Properties</span>
-        <span class="atlas-tag">Schools</span>
-        <span class="atlas-tag">Hospitals</span>
-        <span class="atlas-tag">Shopping</span>
-        <span class="atlas-tag">Hotels</span>
-        <span class="atlas-tag">Beaches</span>
-        <span class="atlas-tag">Restaurants</span>
-        <span class="atlas-tag">Attractions</span>
-        <span class="atlas-tag">Mosques</span>
-      </div>
-
-      <a href="#investment" class="atlas-button reveal">
-        Continue Exploring ↓
-      </a>
-
-    </div>
+    <span>Saadiyat</span><b></b>
+    <span>Yas</span><b></b>
+    <span>Fahid</span><b></b>
+    <span>Hudayriyat</span><b></b>
+    <span>Ramhan</span><b></b>
+    <span>Jubail</span><b></b>
+    <span>Al Reem</span><b></b>
+    <span>Al Maryah</span><b></b>
+    <span>Nurai</span><b></b>
 
   </div>
 
@@ -1470,10 +1503,10 @@ button{
 
 <section class="investment" id="investment">
 
-  <div class="investment-layout">
+  <div class="grid">
 
-    <div class="section-index">
-      05 / Investment
+    <div class="section-number">
+      05 / INVESTMENT
     </div>
 
     <div class="investment-content">
@@ -1483,11 +1516,11 @@ button{
         ABU DHABI?
       </h2>
 
-      <p class="investment-intro reveal">
-        Explore the fundamentals behind Abu Dhabi's
-        property market and understand how location,
-        infrastructure, waterfront scarcity and long-term
-        development can shape an investment decision.
+      <p class="reveal">
+        Understand the fundamentals shaping Abu Dhabi's
+        property landscape, from designated investment areas
+        and infrastructure to waterfront destinations,
+        tourism and long-term development.
       </p>
 
       <div class="investment-rows">
@@ -1500,7 +1533,7 @@ button{
 
         <div class="investment-row reveal">
           <span>02</span>
-          <strong>Waterfront Locations</strong>
+          <strong>Waterfront Destinations</strong>
           <span>↗</span>
         </div>
 
@@ -1512,7 +1545,7 @@ button{
 
         <div class="investment-row reveal">
           <span>04</span>
-          <strong>Tourism & Lifestyle Destinations</strong>
+          <strong>Tourism & Lifestyle</strong>
           <span>↗</span>
         </div>
 
@@ -1535,90 +1568,76 @@ button{
 
 <section class="guide" id="guide">
 
-  <div class="guide-layout">
+  <div>
 
-    <div>
-
-      <div class="section-index">
-        06 / Investor Guide
-      </div>
-
-      <h2 class="reveal">
-        YOUR GUIDE<br>
-        TO ABU DHABI<br>
-        ISLAND LIVING.
-      </h2>
-
-      <p class="guide-copy reveal">
-        Receive our 2026 Abu Dhabi Investment Guide
-        and a curated selection of island property
-        opportunities based on your objectives and budget.
-      </p>
-
+    <div class="eyebrow">
+      06 / INVESTOR GUIDE
     </div>
 
+    <h2 class="reveal">
+      YOUR GUIDE<br>
+      TO ABU DHABI<br>
+      ISLAND LIVING.
+    </h2>
 
-    <form class="guide-form reveal" onsubmit="submitGuide(event)">
-
-      <div class="form-label">
-        Complimentary Guide
-      </div>
-
-      <h3>
-        Abu Dhabi Investment Guide 2026
-      </h3>
-
-      <input required type="text" placeholder="Full Name">
-
-      <input required type="email" placeholder="Email Address">
-
-      <input required type="tel" placeholder="WhatsApp Number">
-
-      <input type="text" placeholder="Country">
-
-      <select>
-        <option>Investment Budget</option>
-        <option>Under AED 1M</option>
-        <option>AED 1M – 2M</option>
-        <option>AED 2M – 5M</option>
-        <option>AED 5M – 10M</option>
-        <option>AED 10M+</option>
-      </select>
-
-      <button type="submit">
-        GET MY FREE GUIDE
-      </button>
-
-    </form>
+    <p class="guide-copy reveal">
+      Request the 2026 Abu Dhabi Investment Guide
+      and a curated selection of island property opportunities
+      based on your requirements and budget.
+    </p>
 
   </div>
+
+
+  <form class="form reveal" id="guideForm">
+
+    <div class="form-label">
+      COMPLIMENTARY GUIDE
+    </div>
+
+    <h3>
+      Abu Dhabi Investment Guide 2026
+    </h3>
+
+    <input required type="text" placeholder="Full Name">
+
+    <input required type="email" placeholder="Email Address">
+
+    <input required type="tel" placeholder="WhatsApp Number">
+
+    <input type="text" placeholder="Country">
+
+    <select>
+      <option>Investment Budget</option>
+      <option>Under AED 1M</option>
+      <option>AED 1M – 2M</option>
+      <option>AED 2M – 5M</option>
+      <option>AED 5M – 10M</option>
+      <option>AED 10M+</option>
+    </select>
+
+    <button type="submit">
+      GET MY FREE GUIDE
+    </button>
+
+  </form>
 
 </section>
 
 
 <!-- FOOTER -->
 
-<footer class="footer">
+<footer>
 
-  <div class="footer-top">
-
-    <div class="footer-brand">
-      ISLAND<br>
-      COLLECTION
-    </div>
-
-    <div class="footer-small">
-      ABU DHABI<br>
-      BETWEEN SEA & SKY<br>
-      UAE
-    </div>
-
+  <div class="footer-title">
+    ISLAND<br>
+    COLLECTION
   </div>
 
   <div class="footer-bottom">
 
     <span>
-      ABU DHABI ISLAND PROPERTY & INVESTMENT
+      ABU DHABI — BETWEEN SEA & SKY
     </span>
 
     <span>
@@ -1630,17 +1649,11 @@ button{
 </footer>
 
 
-<!-- GSAP -->
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-
 <script>
 
-gsap.registerPlugin(ScrollTrigger);
-
-
-/* NAVIGATION */
+/* ==================================
+   NAV
+================================== */
 
 const nav = document.getElementById("nav");
 
@@ -1655,164 +1668,514 @@ window.addEventListener("scroll", () => {
 });
 
 
-/* HERO ENTRANCE */
+/* ==================================
+   MAP DATA
+   Island centers are prototype centers.
+================================== */
 
-const heroTimeline = gsap.timeline({
-  defaults:{
-    ease:"power3.out"
-  }
-});
+const islands = {
 
-heroTimeline
-.from(".hero-eyebrow",{
-  opacity:0,
-  y:20,
-  duration:1
-})
-.from(".hero-title",{
-  opacity:0,
-  y:80,
-  duration:1.4
-},"-=.6")
-.from(".hero-copy",{
-  opacity:0,
-  y:25,
-  duration:.9
-},"-=.7")
-.from(".hero-explore",{
-  opacity:0,
-  y:25,
-  duration:.9
-},"-=.8");
-
-
-/* HERO PARALLAX */
-
-gsap.to(".hero-media",{
-  scale:1.15,
-  yPercent:8,
-  ease:"none",
-  scrollTrigger:{
-    trigger:".hero",
-    start:"top top",
-    end:"bottom top",
-    scrub:true
-  }
-});
-
-gsap.to(".hero-inner",{
-  yPercent:18,
-  opacity:.15,
-  ease:"none",
-  scrollTrigger:{
-    trigger:".hero",
-    start:"top top",
-    end:"bottom top",
-    scrub:true
-  }
-});
-
-
-/* TEXT REVEALS */
-
-gsap.utils.toArray(".reveal").forEach((element) => {
-
-  gsap.to(element,{
-    opacity:1,
-    y:0,
-    duration:1.15,
-    ease:"power3.out",
-    scrollTrigger:{
-      trigger:element,
-      start:"top 87%",
-      toggleActions:"play none none none"
-    }
-  });
-
-});
-
-
-/* IMAGE REVEALS */
-
-gsap.utils.toArray(".image-reveal").forEach((element) => {
-
-  gsap.to(element,{
-    clipPath:"inset(0 0 0% 0)",
-    duration:1.4,
-    ease:"power3.inOut",
-    scrollTrigger:{
-      trigger:element,
-      start:"top 85%"
-    }
-  });
-
-});
-
-
-/* FEATURE IMAGE PARALLAX */
-
-gsap.utils.toArray(".feature-image img").forEach((image) => {
-
-  gsap.fromTo(
-    image,
-    {
-      yPercent:-8
-    },
-    {
-      yPercent:8,
-      ease:"none",
-      scrollTrigger:{
-        trigger:image.parentElement,
-        start:"top bottom",
-        end:"bottom top",
-        scrub:true
-      }
-    }
-  );
-
-});
-
-
-/* CINEMATIC IMAGE MOVEMENT */
-
-gsap.fromTo(
-  ".statement-image",
-  {
-    scale:1.08,
-    yPercent:-5
+  saadiyat:{
+    name:"Saadiyat Island",
+    coords:[54.4350,24.5400],
+    zoom:12.8,
+    text:"Culture, beaches, resorts and residential destinations."
   },
+
+  yas:{
+    name:"Yas Island",
+    coords:[54.6075,24.4959],
+    zoom:12.8,
+    text:"Residential communities, entertainment and waterfront lifestyle."
+  },
+
+  fahid:{
+    name:"Fahid Island",
+    coords:[54.5150,24.5150],
+    zoom:12.8,
+    text:"An emerging coastal and residential destination."
+  },
+
+  hudayriyat:{
+    name:"Hudayriyat Island",
+    coords:[54.3370,24.4160],
+    zoom:12.5,
+    text:"Waterfront development, recreation and emerging communities."
+  },
+
+  ramhan:{
+    name:"Ramhan Island",
+    coords:[54.6800,24.5300],
+    zoom:12.5,
+    text:"Island residential living surrounded by the Gulf."
+  },
+
+  jubail:{
+    name:"Jubail Island",
+    coords:[54.5550,24.5450],
+    zoom:12.7,
+    text:"Low-density island living surrounded by natural landscapes."
+  },
+
+  reem:{
+    name:"Al Reem Island",
+    coords:[54.4070,24.4940],
+    zoom:13.4,
+    text:"Established urban waterfront residential destination."
+  },
+
+  maryah:{
+    name:"Al Maryah Island",
+    coords:[54.3880,24.5010],
+    zoom:14,
+    text:"Business, retail, hospitality and lifestyle district."
+  },
+
+  nurai:{
+    name:"Nurai Island",
+    coords:[54.6040,24.6140],
+    zoom:13.3,
+    text:"Exclusive island resort and residential destination."
+  }
+
+};
+
+
+/* ==================================
+   START LIVE MAP
+================================== */
+
+const map = new maplibregl.Map({
+
+  container:"map",
+
+  style:"https://tiles.openfreemap.org/styles/liberty",
+
+  center:[54.49,24.49],
+
+  zoom:9.7,
+
+  pitch:32,
+
+  bearing:-7,
+
+  antialias:true
+
+});
+
+
+map.addControl(
+  new maplibregl.NavigationControl(),
+  "bottom-right"
+);
+
+
+/* ==================================
+   ISLAND MARKERS
+================================== */
+
+Object.entries(islands).forEach(([key,island]) => {
+
+  const wrap = document.createElement("div");
+  wrap.className = "island-marker-wrap";
+
+  const dot = document.createElement("div");
+  dot.className = "island-dot";
+
+  const label = document.createElement("div");
+  label.className = "island-name";
+  label.textContent = island.name.toUpperCase();
+
+  wrap.appendChild(dot);
+  wrap.appendChild(label);
+
+  wrap.addEventListener("click", () => {
+    flyIsland(key);
+  });
+
+  new maplibregl.Marker({
+    element:wrap,
+    anchor:"center"
+  })
+  .setLngLat(island.coords)
+  .addTo(map);
+
+});
+
+
+/* ==================================
+   FLY TO ISLAND
+================================== */
+
+function flyIsland(key){
+
+  const island = islands[key];
+
+  if(!island) return;
+
+  map.flyTo({
+    center:island.coords,
+    zoom:island.zoom,
+    pitch:45,
+    bearing:-10,
+    speed:.7,
+    curve:1.35,
+    essential:true
+  });
+
+  document.getElementById("mapTitle").textContent =
+    island.name;
+
+  document.getElementById("mapText").textContent =
+    island.text;
+
+}
+
+
+/* ISLAND PANEL */
+
+document
+.querySelectorAll("[data-island]")
+.forEach(button => {
+
+  button.addEventListener("click", () => {
+    flyIsland(button.dataset.island);
+  });
+
+});
+
+
+/* RESET */
+
+document
+.getElementById("resetMap")
+.addEventListener("click", () => {
+
+  map.flyTo({
+    center:[54.49,24.49],
+    zoom:9.7,
+    pitch:32,
+    bearing:-7,
+    speed:.7,
+    essential:true
+  });
+
+  document.getElementById("mapTitle").textContent =
+    "Abu Dhabi Islands";
+
+  document.getElementById("mapText").textContent =
+    "Select an island or zoom into the map to begin exploring.";
+
+});
+
+
+/* ==================================
+   STARTER CURATED POI LAYER
+
+   These are selected major public
+   destinations for the prototype.
+   Expand with verified data before launch.
+================================== */
+
+const places = [
+
   {
-    scale:1.16,
-    yPercent:6,
+    name:"Ferrari World Abu Dhabi",
+    island:"Yas Island",
+    type:"attraction",
+    coords:[54.6071,24.4836]
+  },
+
+  {
+    name:"Yas Mall",
+    island:"Yas Island",
+    type:"shopping",
+    coords:[54.6085,24.4887]
+  },
+
+  {
+    name:"Yas Marina",
+    island:"Yas Island",
+    type:"dining",
+    coords:[54.6094,24.4674]
+  },
+
+  {
+    name:"Louvre Abu Dhabi",
+    island:"Saadiyat Island",
+    type:"attraction",
+    coords:[54.3985,24.5337]
+  },
+
+  {
+    name:"Saadiyat Beach",
+    island:"Saadiyat Island",
+    type:"beach",
+    coords:[54.4430,24.5480]
+  }
+
+];
+
+
+const poiMarkers = [];
+
+let activeFilter = "all";
+
+
+places.forEach(place => {
+
+  const element = document.createElement("div");
+
+  element.className =
+    "poi poi-" + place.type;
+
+
+  const popup =
+    new maplibregl.Popup({
+      offset:17
+    })
+    .setHTML(
+      '<span class="popup-type">' +
+      place.type +
+      '</span>' +
+      '<strong>' +
+      place.name +
+      '</strong>' +
+      '<small>' +
+      place.island +
+      '</small>'
+    );
+
+
+  const marker =
+    new maplibregl.Marker({
+      element:element
+    })
+    .setLngLat(place.coords)
+    .setPopup(popup)
+    .addTo(map);
+
+
+  poiMarkers.push({
+    element,
+    marker,
+    place
+  });
+
+});
+
+
+/* ==================================
+   PROGRESSIVE DETAIL
+
+   POIs appear when zooming closer.
+================================== */
+
+function updatePOIs(){
+
+  const zoom = map.getZoom();
+
+  poiMarkers.forEach(item => {
+
+    const matches =
+      activeFilter === "all" ||
+      item.place.type === activeFilter;
+
+    item.element.style.display =
+      zoom >= 11.7 && matches
+      ? "block"
+      : "none";
+
+  });
+
+}
+
+
+map.on("zoom", updatePOIs);
+
+map.on("load", updatePOIs);
+
+
+/* ==================================
+   CATEGORY FILTERS
+================================== */
+
+document
+.querySelectorAll(".filter")
+.forEach(button => {
+
+  button.addEventListener("click", () => {
+
+    document
+    .querySelectorAll(".filter")
+    .forEach(item => {
+      item.classList.remove("active");
+    });
+
+    button.classList.add("active");
+
+    activeFilter =
+      button.dataset.filter;
+
+    updatePOIs();
+
+  });
+
+});
+
+
+/* ==================================
+   JUMP FROM ISLAND STORY TO MAP
+================================== */
+
+document
+.querySelectorAll("[data-jump]")
+.forEach(link => {
+
+  link.addEventListener("click", event => {
+
+    event.preventDefault();
+
+    const key =
+      link.dataset.jump;
+
+    document
+    .getElementById("atlas")
+    .scrollIntoView({
+      behavior:"smooth"
+    });
+
+    setTimeout(() => {
+      flyIsland(key);
+    },700);
+
+  });
+
+});
+
+
+/* ==================================
+   GSAP SCROLL ANIMATION
+================================== */
+
+if(
+  window.gsap &&
+  window.ScrollTrigger
+){
+
+  gsap.registerPlugin(ScrollTrigger);
+
+
+  gsap.from(".hero-meta",{
+    opacity:0,
+    y:20,
+    duration:1
+  });
+
+
+  gsap.from(".hero h1",{
+    opacity:0,
+    y:70,
+    duration:1.3,
+    delay:.15,
+    ease:"power3.out"
+  });
+
+
+  gsap.from(".hero-bottom",{
+    opacity:0,
+    y:30,
+    duration:1,
+    delay:.45,
+    ease:"power3.out"
+  });
+
+
+  gsap.to(".hero-image",{
+
+    scale:1.14,
+
+    yPercent:7,
+
     ease:"none",
+
     scrollTrigger:{
-      trigger:".statement",
+      trigger:".hero",
+      start:"top top",
+      end:"bottom top",
+      scrub:true
+    }
+
+  });
+
+
+  gsap.utils
+  .toArray(".reveal")
+  .forEach(element => {
+
+    gsap.to(element,{
+      opacity:1,
+      y:0,
+      duration:1.1,
+      ease:"power3.out",
+      scrollTrigger:{
+        trigger:element,
+        start:"top 88%"
+      }
+    });
+
+  });
+
+
+  gsap.to(".cinematic-image",{
+
+    scale:1.12,
+
+    yPercent:5,
+
+    ease:"none",
+
+    scrollTrigger:{
+      trigger:".cinematic",
       start:"top bottom",
       end:"bottom top",
       scrub:true
     }
-  }
-);
+
+  });
 
 
-/* ATLAS ORBIT MOVEMENT */
+  gsap.utils
+  .toArray(".island-photo img")
+  .forEach(image => {
 
-gsap.to(".atlas-orbit",{
-  rotation:35,
-  scale:1.12,
-  ease:"none",
-  scrollTrigger:{
-    trigger:".atlas-preview",
-    start:"top bottom",
-    end:"bottom top",
-    scrub:true
-  }
-});
+    gsap.fromTo(
+      image,
+      {yPercent:-7},
+      {
+        yPercent:7,
+        ease:"none",
+        scrollTrigger:{
+          trigger:image.parentElement,
+          start:"top bottom",
+          end:"bottom top",
+          scrub:true
+        }
+      }
+    );
+
+  });
+
+}
 
 
-/* FORM */
+/* ==================================
+   FORM
+================================== */
 
-function submitGuide(event){
+document
+.getElementById("guideForm")
+.addEventListener("submit", event => {
 
   event.preventDefault();
 
@@ -1820,7 +2183,7 @@ function submitGuide(event){
     "Thank you. Your Abu Dhabi Investment Guide request has been received."
   );
 
-}
+});
 
 </script>
 
